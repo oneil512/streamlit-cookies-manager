@@ -64,9 +64,21 @@ class CookieManager(MutableMapping[str, str]):
                 path=self._path,
             )
 
+    def set(self, key: str, value: str, expires_at: datetime):
+        self._queue[key] = dict(
+            value=value,
+            expires_at=expires_at.isoformat(),
+            path=self._path,
+        )
+
     def __delitem__(self, key: str) -> None:
         if key in self._cookies:
             self._queue[key] = dict(value=None, path=self._path)
+
+    def delete(self, key: str):
+        if key in self._cookies:
+            # set expiry to now
+            self._queue[key] = dict(value=None, expires_at=datetime.now().isoformat(), path=self._path)
 
     def _get_cookies(self) -> Mapping[str, str]:
         if self._cookies is None:
